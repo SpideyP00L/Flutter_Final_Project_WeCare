@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_final_project/NurseHomeScreen.dart';
+import 'package:flutter_final_project/NurseNewLogin.dart';
 
 class NurseLoginScreen extends StatelessWidget {
   @override
@@ -92,6 +93,43 @@ class NurseLoginScreen extends StatelessWidget {
                     ),
                     child: Text(
                       'Login',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                Container(
+                  width: 250,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NurseNewLoginScreen()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                    ).copyWith(
+                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                        (Set<MaterialState> states) {
+                          if (states.contains(MaterialState.pressed)) {
+                            return Color(0xFFCED5FF);
+                          }
+                          return Colors.white;
+                        },
+                      ),
+                    ),
+                    child: Text(
+                      'Create New Account',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 16,
