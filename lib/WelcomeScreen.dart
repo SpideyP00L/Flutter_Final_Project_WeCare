@@ -84,7 +84,7 @@ class AppWelcomeScreen extends StatelessWidget {
                 Padding(
                   padding: EdgeInsets.symmetric(
                       horizontal: MediaQuery.of(context).size.width * 0.1,
-                      vertical: 10.0),
+                      vertical: 40.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
