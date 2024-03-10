@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'nurseloginscreen.dart';
+import 'doctorloginscreen.dart';
 
 void main() {
   runApp(const AppWelcomeScreen());
@@ -29,7 +31,8 @@ class AppWelcomeScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.1),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.1),
                   child: Image.asset(
                     'WeCare_Logo.png',
                     width: 300,
@@ -38,27 +41,129 @@ class AppWelcomeScreen extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.1, vertical: 10.0),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.1,
+                      vertical: 10.0),
+                  child: Text(
+                    'Welcome to WeCare - Your Patient Data Solution',
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.1,
+                      vertical: 10.0),
                   child: RichText(
                     textAlign: TextAlign.justify,
                     text: TextSpan(
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 24,
-                        fontFamily: 'Times New Roman',
                       ),
                       children: [
                         TextSpan(
-                          text: 'Welcome to our Patient Data Mobile App. Seamlessly manage patient records, update clinical data. ',
+                          text:
+                              'Welcome to our Patient Data Mobile App. Seamlessly manage patient records, update clinical data. ',
                         ),
                         TextSpan(
-                          text: 'Elevate your patient care with Simplicity and Precision.',
+                          text:
+                              'Elevate your patient care with Simplicity and Precision.',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ],
                     ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: MediaQuery.of(context).size.width * 0.1,
+                      vertical: 10.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 250,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => NurseLoginScreen()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                          ).copyWith(
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.pressed)) {
+                                  return Color(0xFFCED5FF);
+                                }
+                                return Colors.white;
+                              },
+                            ),
+                          ),
+                          child: Text(
+                            'Sign In As Nurse',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16),
+                      Container(
+                        width: 250,
+                        height: 50,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => DoctorLoginScreen()),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(50),
+                            ),
+                          ).copyWith(
+                            backgroundColor:
+                                MaterialStateProperty.resolveWith<Color>(
+                              (Set<MaterialState> states) {
+                                if (states.contains(MaterialState.pressed)) {
+                                  return Color(0xFFCED5FF);
+                                }
+                                return Colors.white;
+                              },
+                            ),
+                          ),
+                          child: Text(
+                            'Sign In As Doctor',
+                            style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
