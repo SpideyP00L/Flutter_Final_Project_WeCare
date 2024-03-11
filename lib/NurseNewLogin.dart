@@ -1,7 +1,64 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_final_project/NurseHomeScreen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class NurseNewLoginScreen extends StatelessWidget {
+Future<void> NurseNewLoginData(
+    String Nurse_Full_Name, String Nurse_Email, String Nurse_Password) async {
+  final url = Uri.parse('http://127.0.0.1:9001/api/nurse/register');
+  try {
+    final response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'Nurse_Full_Name': Nurse_Full_Name,
+        'Nurse_Email': Nurse_Email,
+        'Nurse_Password': Nurse_Password,
+      }),
+    );
+
+    if (response.statusCode == 201) {
+      print('New Nurse Login Created successfully with data: \n Nurse Full Name : $Nurse_Full_Name, \n Nurse Email ID: $Nurse_Email, \n Nurse Password: $Nurse_Password');
+    } else {
+      throw Exception('Failed to Create New Nurse Login: ${response.body}');
+    }
+  } catch (e) {
+    print('Error In Creating New Nurse Login : $e');
+    throw Exception('Failed to Create New Nurse Login: $e');
+  }
+}
+
+
+
+class NurseNewLoginScreen extends StatefulWidget {
+  const NurseNewLoginScreen({Key? key}) : super(key: key);
+
+  @override
+  State<NurseNewLoginScreen> createState() => _NurseNewLoginScreenState();
+}
+
+class _NurseNewLoginScreenState extends State<NurseNewLoginScreen> {
+  final _NurseCreateNewAccountKey = GlobalKey<FormState>();
+
+  late TextEditingController _NurseFullNameController;
+  late TextEditingController _NurseEmailController;
+  late TextEditingController _NursePasswordController;
+
+  @override
+  void initState() {
+    super.initState();
+    _NurseFullNameController = TextEditingController();
+    _NurseEmailController = TextEditingController();
+    _NursePasswordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _NurseFullNameController.dispose();
+    _NurseEmailController.dispose();
+    _NursePasswordController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,119 +74,165 @@ class NurseNewLoginScreen extends StatelessWidget {
           ),
         ),
         child: Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery.of(context).size.width * 0.1,
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: MediaQuery.of(context).size.width * 0.1,
-                  ),
-                  child: Image.asset(
-                    'Nurse.png',
-                    width: 300,
-                    height: 300,
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                TextField(
-                  style: TextStyle(color: Colors.black),
-                  decoration: InputDecoration(
-                    labelText: 'Nurse Full Name',
-                    labelStyle: TextStyle(color: Colors.black),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                TextField(
-                  style: TextStyle(color: Colors.black),
-                  decoration: InputDecoration(
-                    labelText: 'Nurse Email ID',
-                    labelStyle: TextStyle(color: Colors.black),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                TextField(
-                  style: TextStyle(color: Colors.black),
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    labelStyle: TextStyle(color: Colors.black),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20),
-                TextField(
-                  style: TextStyle(color: Colors.black),
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
-                    labelStyle: TextStyle(color: Colors.black),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Colors.black),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 50),
-                Container(
-                  width: 250,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => NurseHomeScreen()),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.1,
+              ),
+              child: Form(
+                key: _NurseCreateNewAccountKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.1,
                       ),
-                    ).copyWith(
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                        (Set<MaterialState> states) {
-                          if (states.contains(MaterialState.pressed)) {
-                            return Color(0xFFCED5FF);
+                      child: Image.asset(
+                        'Nurse.png',
+                        width: 300,
+                        height: 300,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _NurseFullNameController,
+                      style: TextStyle(color: Colors.black),
+                      decoration: InputDecoration(
+                        labelText: 'Nurse Full Name',
+                        labelStyle: TextStyle(color: Colors.black),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your full name';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      controller: _NurseEmailController,
+                      style: TextStyle(color: Colors.black),
+                      decoration: InputDecoration(
+                        labelText: 'Nurse Email ID',
+                        labelStyle: TextStyle(color: Colors.black),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter your email';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      controller: _NursePasswordController,
+                      style: TextStyle(color: Colors.black),
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Password',
+                        labelStyle: TextStyle(color: Colors.black),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                      ),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a password';
+                        }
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
+                      style: TextStyle(color: Colors.black),
+                      obscureText: true,
+                      decoration: InputDecoration(
+                        labelText: 'Confirm Password',
+                        labelStyle: TextStyle(color: Colors.black),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: BorderSide(color: Colors.black),
+                        ),
+                      ),
+                      validator: (value) {
+                        // Add password confirmation validation logic if needed
+                        return null;
+                      },
+                    ),
+                    SizedBox(height: 50),
+                    Container(
+                      width: 250,
+                      height: 50,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          if (_NurseCreateNewAccountKey.currentState!.validate()) {
+                            try {
+                              await NurseNewLoginData(
+                                _NurseFullNameController.text,
+                                _NurseEmailController.text,
+                                _NursePasswordController.text,
+                              );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Sign Up Successful'),
+                                ),
+                              );
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Failed to sign up: $e'),
+                                ),
+                              );
+                            }
                           }
-                          return Colors.white;
                         },
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
+                        ).copyWith(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              if (states.contains(MaterialState.pressed)) {
+                                return Color(0xFFCED5FF);
+                              }
+                              return Colors.white;
+                            },
+                          ),
+                        ),
+                        child: Text(
+                          'Create Account',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
-                    child: Text(
-                      'Create Account',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
