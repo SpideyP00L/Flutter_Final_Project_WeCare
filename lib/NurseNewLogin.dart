@@ -6,7 +6,7 @@ class NurseNewLoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create New Nurse'),
+        title: Text('Create New Nurse Login'),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -38,7 +38,21 @@ class NurseNewLoginScreen extends StatelessWidget {
                 TextField(
                   style: TextStyle(color: Colors.black),
                   decoration: InputDecoration(
-                    labelText: 'Email',
+                    labelText: 'Nurse Full Name',
+                    labelStyle: TextStyle(color: Colors.black),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+                TextField(
+                  style: TextStyle(color: Colors.black),
+                  decoration: InputDecoration(
+                    labelText: 'Nurse Email ID',
                     labelStyle: TextStyle(color: Colors.black),
                     enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.black),
