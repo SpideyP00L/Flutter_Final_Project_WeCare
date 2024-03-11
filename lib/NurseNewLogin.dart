@@ -27,8 +27,6 @@ Future<void> NurseNewLoginData(
   }
 }
 
-
-
 class NurseNewLoginScreen extends StatefulWidget {
   const NurseNewLoginScreen({Key? key}) : super(key: key);
 
@@ -42,6 +40,7 @@ class _NurseNewLoginScreenState extends State<NurseNewLoginScreen> {
   late TextEditingController _NurseFullNameController;
   late TextEditingController _NurseEmailController;
   late TextEditingController _NursePasswordController;
+  late TextEditingController _ConfirmPasswordController;
 
   @override
   void initState() {
@@ -49,6 +48,7 @@ class _NurseNewLoginScreenState extends State<NurseNewLoginScreen> {
     _NurseFullNameController = TextEditingController();
     _NurseEmailController = TextEditingController();
     _NursePasswordController = TextEditingController();
+    _ConfirmPasswordController = TextEditingController();
   }
 
   @override
@@ -56,6 +56,7 @@ class _NurseNewLoginScreenState extends State<NurseNewLoginScreen> {
     _NurseFullNameController.dispose();
     _NurseEmailController.dispose();
     _NursePasswordController.dispose();
+    _ConfirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -132,6 +133,8 @@ class _NurseNewLoginScreenState extends State<NurseNewLoginScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter your email';
+                        } else if (!RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$').hasMatch(value)) {
+                          return 'Please enter a valid email address';
                         }
                         return null;
                       },
@@ -154,12 +157,15 @@ class _NurseNewLoginScreenState extends State<NurseNewLoginScreen> {
                       validator: (value) {
                         if (value == null || value.isEmpty) {
                           return 'Please enter a password';
+                        } else if (value.length < 8) {
+                          return 'Password must be at least 8 characters long';
                         }
                         return null;
                       },
                     ),
                     SizedBox(height: 20),
                     TextFormField(
+                      controller: _ConfirmPasswordController,
                       style: TextStyle(color: Colors.black),
                       obscureText: true,
                       decoration: InputDecoration(
@@ -173,7 +179,11 @@ class _NurseNewLoginScreenState extends State<NurseNewLoginScreen> {
                         ),
                       ),
                       validator: (value) {
-                        // Add password confirmation validation logic if needed
+                        if (value == null || value.isEmpty) {
+                          return 'Please confirm your password';
+                        } else if (value != _NursePasswordController.text) {
+                          return 'Passwords do not match';
+                        }
                         return null;
                       },
                     ),
