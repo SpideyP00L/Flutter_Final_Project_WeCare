@@ -1,8 +1,46 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_final_project/NurseHomeScreen.dart';
 import 'package:flutter_final_project/NurseNewLogin.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class NurseLoginScreen extends StatelessWidget {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _login(BuildContext context) async {
+    final url = Uri.parse('http://127.0.0.1:9001/api/nurse/login');
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'Nurse_Email': _emailController.text,
+          'Nurse_Password': _passwordController.text,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => NurseHomeScreen()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login failed. Please check your credentials.'),
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error during login: $e'),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,6 +75,7 @@ class NurseLoginScreen extends StatelessWidget {
                   ),
                 ),
                 TextField(
+                  controller: _emailController,
                   style: TextStyle(color: Colors.black),
                   decoration: InputDecoration(
                     labelText: 'Email',
@@ -51,6 +90,7 @@ class NurseLoginScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
                 TextField(
+                  controller: _passwordController,
                   style: TextStyle(color: Colors.black),
                   obscureText: true,
                   decoration: InputDecoration(
@@ -69,13 +109,7 @@ class NurseLoginScreen extends StatelessWidget {
                   width: 250,
                   height: 50,
                   child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => NurseHomeScreen()),
-                      );
-                    },
+                    onPressed: () => _login(context),
                     style: ElevatedButton.styleFrom(
                       primary: Colors.transparent,
                       shape: RoundedRectangleBorder(
