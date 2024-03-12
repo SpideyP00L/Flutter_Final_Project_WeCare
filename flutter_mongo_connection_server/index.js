@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 
 const SERVER_NAME = 'Flutter_Final_Project';
-const PORT = 9001;
+const PORT = 9002;
 const HOST = '127.0.0.1';
 
 const app = express();
@@ -19,6 +19,14 @@ const nurseSchema = new mongoose.Schema({
 });
 
 const Nurse = mongoose.model('NurseNewLogin', nurseSchema);
+
+const doctorSchema = new mongoose.Schema({
+    Doctor_Full_Name: String,
+    Doctor_Email: String,
+    Doctor_Password: String,
+  });
+  
+  const Doctor = mongoose.model('DoctorNewLogin', doctorSchema);
 
 mongoose.connect(uristring, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log(`Connected to database: ${uristring}`))
@@ -42,6 +50,24 @@ app.post('/api/nurse/register', async (req, res) => {
   }
 });
 
+app.post('/api/doctor/register', async (req, res) => {
+    try {
+      console.log('Received data:', req.body);
+  
+      const { Doctor_Full_Name, Doctor_Email, Doctor_Password } = req.body;
+  
+      const doctor = new Doctor({ Doctor_Full_Name, Doctor_Email, Doctor_Password });
+      await doctor.save();
+  
+      console.log('Doctor data saved:', doctor);
+  
+      res.status(201).json({ message: 'Doctor registered successfully' });
+    } catch (error) {
+      console.error('Error registering doctor:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
 app.post('/api/nurse/login', async (req, res) => {
   try {
     const { Nurse_Email, Nurse_Password } = req.body;
@@ -62,6 +88,27 @@ app.post('/api/nurse/login', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+app.post('/api/doctor/login', async (req, res) => {
+    try {
+      const { Doctor_Email, Doctor_Password } = req.body;
+      const doctor = await Doctor.findOne({ Doctor_Email });
+  
+      if (!doctor) {
+        return res.status(401).json({ error: 'Invalid email or password' });
+      }
+  
+      // Compare the entered password with the stored password directly
+      if (Doctor_Password !== doctor.Doctor_Password) {
+        return res.status(401).json({ error: 'Invalid email or password' });
+      }
+  
+      res.status(200).json({ message: 'Login successful' });
+    } catch (error) {
+      console.error('Error during doctor login:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
 
 app.listen(PORT, HOST, () => {
   console.log(`${SERVER_NAME} server running at http://${HOST}:${PORT}`);

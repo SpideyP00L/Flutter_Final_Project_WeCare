@@ -4,7 +4,7 @@ import 'dart:convert';
 
 Future<void> NurseNewLoginData(
     String Nurse_Full_Name, String Nurse_Email, String Nurse_Password) async {
-  final url = Uri.parse('http://127.0.0.1:9001/api/nurse/register');
+  final url = Uri.parse('http://127.0.0.1:9002/api/nurse/register');
   try {
     final response = await http.post(
       url,
