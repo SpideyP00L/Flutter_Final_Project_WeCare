@@ -23,7 +23,7 @@ class NurseLoginScreen extends StatelessWidget {
       if (response.statusCode == 200) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => NurseHomeScreen()),
+          MaterialPageRoute(builder: (context) => NurseHomeScreen(email: _emailController.text)),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(

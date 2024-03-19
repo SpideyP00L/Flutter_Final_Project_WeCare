@@ -89,6 +89,22 @@ app.post('/api/nurse/login', async (req, res) => {
   }
 });
 
+app.get('/api/nurse/name', async (req, res) => {
+  try {
+    const { email } = req.query;
+    const nurse = await Nurse.findOne({ Nurse_Email: email });
+
+    if (!nurse) {
+      return res.status(404).json({ error: 'Nurse not found' });
+    }
+
+    res.status(200).json({ Nurse_Full_Name: nurse.Nurse_Full_Name });
+  } catch (error) {
+    console.error('Error fetching nurse name:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.post('/api/doctor/login', async (req, res) => {
     try {
       const { Doctor_Email, Doctor_Password } = req.body;
