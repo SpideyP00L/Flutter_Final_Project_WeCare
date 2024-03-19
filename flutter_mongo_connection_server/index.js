@@ -26,7 +26,25 @@ const doctorSchema = new mongoose.Schema({
     Doctor_Password: String,
   });
   
-  const Doctor = mongoose.model('DoctorNewLogin', doctorSchema);
+const Doctor = mongoose.model('DoctorNewLogin', doctorSchema);
+
+const patientSchema = new mongoose.Schema({
+  Patient_ID: { type: mongoose.Schema.Types.ObjectId, auto: true },
+  Patient_Name: String,
+  Patient_Age: Number,
+  Patient_Address: String,
+  Patient_Gender: String,
+  Patient_Phone_Number: String,
+  Tests: {
+    Blood_Pressure: String,
+    Heart_Rate: String,
+    Respiratory_Rate: String,
+    Oxygen_Saturation: String,
+    Body_Temperature: String
+  }
+});
+
+const Patient = mongoose.model('PatientNewRecord', patientSchema);
 
 mongoose.connect(uristring, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log(`Connected to database: ${uristring}`))
@@ -125,6 +143,51 @@ app.post('/api/doctor/login', async (req, res) => {
       res.status(500).json({ error: 'Internal server error' });
     }
   });
+
+  // Save patient data
+app.post('/api/patient/save', async (req, res) => {
+  try {
+    console.log('Received patient data:', req.body);
+
+    const { Patient_Name, Patient_Age, Patient_Address, Patient_Gender, Patient_Phone_Number } = req.body;
+
+    const patient = new Patient({ Patient_Name, Patient_Age, Patient_Address, Patient_Gender, Patient_Phone_Number, });
+    await patient.save();
+
+    console.log('Patient data saved:', patient);
+
+    res.status(201).json({ message: 'Patient data saved successfully' });
+  } catch (error) {
+    console.error('Error saving patient data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Retrieve all patients
+app.get('/api/patients', async (req, res) => {
+  try {
+    const patients = await Patient.find();
+
+    if (!patients || patients.length === 0) {
+      return res.status(404).json({ error: 'No patients found' });
+    }
+
+    const formattedPatients = patients.map(patient => {
+      if (!patient.Tests || Object.keys(patient.Tests).length === 0) {
+        return {
+          ...patient._doc,
+          Tests: 'No tests available for this patient'
+        };
+      }
+      return patient;
+    });
+
+    res.status(200).json(formattedPatients);
+  } catch (error) {
+    console.error('Error fetching patients data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 app.listen(PORT, HOST, () => {
   console.log(`${SERVER_NAME} server running at http://${HOST}:${PORT}`);
