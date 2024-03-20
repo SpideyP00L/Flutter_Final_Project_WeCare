@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'PatientTestInfoScreen.dart';
+import 'UpdatePatientInfoScreen.dart';
 
 class NurseHomeScreen extends StatefulWidget {
   final String email;
@@ -25,97 +27,221 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
   }
 
   Widget _buildHomeWidget() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        ListTile(
-          leading: Icon(Icons.person, size: 48),
-          title: FutureBuilder<String>(
-            future: getNurseName(widget.email),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return CircularProgressIndicator();
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else {
-                final nurseName = snapshot.data!;
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Welcome, $nurseName!',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      'Hope you are doing well today!',
-                      style: TextStyle(fontSize: 18),
-                    ),
-                  ],
-                );
-              }
-            },
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      ListTile(
+        leading: Icon(Icons.person, size: 48),
+        title: FutureBuilder<String>(
+          future: getNurseName(widget.email),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              final nurseName = snapshot.data!;
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Welcome, $nurseName!',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                  Text(
+                    'Hope you are doing well today!',
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ],
+              );
+            }
+          },
+        ),
+      ),
+      Expanded(
+        child: _buildPatientList(),
+      ),
+      Padding(
+        padding: EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 10),
+        child: ElevatedButton(
+          onPressed: deleteAllPatients,
+          style: ElevatedButton.styleFrom(
+            primary: Colors.red, // Change the background color
+            onPrimary: Colors.white, // Change the text color
+            padding: EdgeInsets.symmetric(vertical: 16.0), // Adjust padding
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0), // Adjust the button's border radius
+            ),
+          ),
+          child: Text(
+            'Delete All Patients',
+            style: TextStyle(fontSize: 18.0),
           ),
         ),
-        Expanded(
-          child: _buildPatientList(),
-        ),
-      ],
+      ),
+    ],
+  );
+}
+
+
+  Widget _buildPatientList() {
+    return Builder(
+      builder: (context) {
+        final screenWidth = MediaQuery.of(context).size.width;
+        final horizontalMargin = screenWidth * 0.05;
+
+        return Container(
+          margin: EdgeInsets.symmetric(horizontal: horizontalMargin),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: 30),
+              Text(
+                'Patients Records :',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 16),
+              Expanded(
+                child: FutureBuilder<List<dynamic>>(
+                  future: getAllPatients(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else {
+                      final patients = snapshot.data!;
+                      return ListView.separated(
+                        itemCount: patients.length,
+                        separatorBuilder: (context, index) => Divider(),
+                        itemBuilder: (context, index) {
+                          final patient = patients[index];
+                          return Card(
+                            elevation: 3,
+                            child: ListTile(
+                              contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              leading: Icon(Icons.person),
+                              title: Text(
+                                patient['Patient_Name'],
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  SizedBox(height: 4),
+                                  Text('Age: ${patient['Patient_Age']}'),
+                                  SizedBox(height: 4),
+                                  Text(
+                                      'Address: ${patient['Patient_Address']}'),
+                                  SizedBox(height: 4),
+                                  Text('Gender: ${patient['Patient_Gender']}'),
+                                  SizedBox(height: 4),
+                                  Text(
+                                      'Phone Number: ${patient['Patient_Phone_Number']}'),
+                                ],
+                              ),
+                              trailing: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  IconButton(
+                                    icon: Icon(Icons.edit),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              UpdatePatientInfoScreen(
+                                                  patientId: patient['_id']),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.delete),
+                                    onPressed: () {
+                                      deletePatient(patient['_id']);
+                                    },
+                                  ),
+                                ],
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PatientTestInfoScreen(
+                                        patientId: patient['_id']),
+                                  ),
+                                );
+                              },
+                            ),
+                          );
+                        },
+                      );
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Widget _buildPatientList() {
-    return FutureBuilder<List<dynamic>>(
-      future: getAllPatients(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error: ${snapshot.error}'));
-        } else {
-          final patients = snapshot.data!;
-          return ListView.separated(
-            itemCount: patients.length,
-            separatorBuilder: (context, index) => Divider(),
-            itemBuilder: (context, index) {
-              final patient = patients[index];
-              return Card(
-                elevation: 3,
-                child: ListTile(
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  leading: Icon(Icons.person),
-                  title: Text(
-                    patient['Patient_Name'],
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(height: 4),
-                      Text('Age: ${patient['Patient_Age']}'),
-                      SizedBox(height: 4),
-                      Text('Address: ${patient['Patient_Address']}'),
-                      SizedBox(height: 4),
-                      Text('Gender: ${patient['Patient_Gender']}'),
-                      SizedBox(height: 4),
-                      Text('Phone Number: ${patient['Patient_Phone_Number']}'),
-                    ],
-                  ),
-                  trailing: IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                      // Handle edit action
-                    },
-                  ),
-                  onTap: () {
-                    // Handle tap action
-                  },
-                ),
-              );
-            },
-          );
-        }
-      },
-    );
+  Future<void> deletePatient(String id) async {
+    final url = Uri.parse('http://127.0.0.1:9002/api/patient/delete/$id');
+    try {
+      final response = await http.delete(url);
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Patient deleted successfully'),
+          ),
+        );
+        // Update the list of patients after deleting a patient
+        setState(() {
+          _homeWidget = _buildHomeWidget(); // Rebuild the home widget
+        });
+      } else {
+        throw Exception('Failed to delete patient');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to delete patient: $e'),
+        ),
+      );
+    }
+  }
+
+  Future<void> deleteAllPatients() async {
+    final url = Uri.parse('http://127.0.0.1:9002/api/patients/delete-all');
+    try {
+      final response = await http.delete(url);
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('All patients deleted successfully'),
+          ),
+        );
+        // Update the list of patients after deleting all patients
+        setState(() {
+          _homeWidget = _buildHomeWidget(); // Rebuild the home widget
+        });
+      } else {
+        throw Exception('Failed to delete all patients');
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to delete all patients: $e'),
+        ),
+      );
+    }
   }
 
   // Add Patient Screen
@@ -156,7 +282,7 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
                 content: Text('Patient data saved successfully'),
               ),
             );
-            
+
             // Update the list of patients after saving a new patient
             setState(() {
               _homeWidget = _buildHomeWidget(); // Rebuild the home widget

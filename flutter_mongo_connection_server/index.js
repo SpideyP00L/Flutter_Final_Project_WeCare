@@ -29,7 +29,7 @@ const doctorSchema = new mongoose.Schema({
 const Doctor = mongoose.model('DoctorNewLogin', doctorSchema);
 
 const patientSchema = new mongoose.Schema({
-  Patient_ID: { type: mongoose.Schema.Types.ObjectId, auto: true },
+  _id: { type: mongoose.Schema.Types.ObjectId, auto: true},
   Patient_Name: String,
   Patient_Age: Number,
   Patient_Address: String,
@@ -44,7 +44,8 @@ const patientSchema = new mongoose.Schema({
   }
 });
 
-const Patient = mongoose.model('PatientNewRecord', patientSchema);
+
+const Patient = mongoose.model('NewPatientData', patientSchema);
 
 mongoose.connect(uristring, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log(`Connected to database: ${uristring}`))
@@ -185,6 +186,33 @@ app.get('/api/patients', async (req, res) => {
     res.status(200).json(formattedPatients);
   } catch (error) {
     console.error('Error fetching patients data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.delete('/api/patients/delete-all', async (req, res) => {
+  try {
+    await Patient.deleteMany({});
+
+    res.status(200).json({ message: 'All patients deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting patients:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+app.delete('/api/patient/delete/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const patient = await Patient.findByIdAndDelete(id);
+
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    res.status(200).json({ message: 'Patient deleted successfully', deletedPatient: patient });
+  } catch (error) {
+    console.error('Error deleting patient:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
