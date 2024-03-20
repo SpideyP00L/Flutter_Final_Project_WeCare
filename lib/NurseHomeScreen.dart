@@ -25,42 +25,100 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
   }
 
   Widget _buildHomeWidget() {
-    return FutureBuilder<String>(
-      future: getNurseName(widget.email),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ListTile(
+          leading: Icon(Icons.person, size: 48),
+          title: FutureBuilder<String>(
+            future: getNurseName(widget.email),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                final nurseName = snapshot.data!;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome, $nurseName!',
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Hope you are doing well today!',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ],
+                );
+              }
+            },
+          ),
+        ),
+        Expanded(
+          child: _buildPatientList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPatientList() {
+    return FutureBuilder<List<dynamic>>(
+      future: getAllPatients(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
+          return Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Center(
-            child: Text('Error: ${snapshot.error}'),
-          );
+          return Center(child: Text('Error: ${snapshot.error}'));
         } else {
-          final nurseName = snapshot.data!;
-          return Center(
-            // Wrap the Column with a Center widget
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Welcome, $nurseName!',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          final patients = snapshot.data!;
+          return ListView.separated(
+            itemCount: patients.length,
+            separatorBuilder: (context, index) => Divider(),
+            itemBuilder: (context, index) {
+              final patient = patients[index];
+              return Card(
+                elevation: 3,
+                child: ListTile(
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  leading: Icon(Icons.person),
+                  title: Text(
+                    patient['Patient_Name'],
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 4),
+                      Text('Age: ${patient['Patient_Age']}'),
+                      SizedBox(height: 4),
+                      Text('Address: ${patient['Patient_Address']}'),
+                      SizedBox(height: 4),
+                      Text('Gender: ${patient['Patient_Gender']}'),
+                      SizedBox(height: 4),
+                      Text('Phone Number: ${patient['Patient_Phone_Number']}'),
+                    ],
+                  ),
+                  trailing: IconButton(
+                    icon: Icon(Icons.edit),
+                    onPressed: () {
+                      // Handle edit action
+                    },
+                  ),
+                  onTap: () {
+                    // Handle tap action
+                  },
                 ),
-                SizedBox(height: 20),
-                Text(
-                  'Hope you are doing well today!',
-                  style: TextStyle(fontSize: 18),
-                ),
-              ],
-            ),
+              );
+            },
           );
         }
       },
     );
   }
 
-// Add Patient Screen
+  // Add Patient Screen
   Widget _buildAddPatientWidget() {
     final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
     TextEditingController _patientNameController = TextEditingController();
@@ -98,6 +156,11 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
                 content: Text('Patient data saved successfully'),
               ),
             );
+            
+            // Update the list of patients after saving a new patient
+            setState(() {
+              _homeWidget = _buildHomeWidget(); // Rebuild the home widget
+            });
           } else {
             throw Exception('Failed to save patient data: ${response.body}');
           }
@@ -321,5 +384,20 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
         ],
       ),
     );
+  }
+}
+
+Future<List<dynamic>> getAllPatients() async {
+  final url = Uri.parse('http://127.0.0.1:9002/api/patients');
+  try {
+    final response = await http.get(url);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data;
+    } else {
+      throw Exception('Failed to fetch patients');
+    }
+  } catch (e) {
+    throw Exception('Error: $e');
   }
 }
