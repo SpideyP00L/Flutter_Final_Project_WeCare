@@ -251,8 +251,7 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
     TextEditingController _patientAgeController = TextEditingController();
     TextEditingController _patientAddressController = TextEditingController();
     TextEditingController _patientGenderController = TextEditingController();
-    TextEditingController _patientPhoneNumberController =
-        TextEditingController();
+    TextEditingController _patientPhoneNumberController = TextEditingController();
 
     Future<void> savePatientData() async {
       if (_formKey.currentState!.validate()) {

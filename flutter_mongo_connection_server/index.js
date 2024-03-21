@@ -190,6 +190,7 @@ app.get('/api/patients', async (req, res) => {
   }
 });
 
+// Delete All Patients
 app.delete('/api/patients/delete-all', async (req, res) => {
   try {
     await Patient.deleteMany({});
@@ -201,6 +202,7 @@ app.delete('/api/patients/delete-all', async (req, res) => {
   }
 });
 
+// Delete Patient By ID
 app.delete('/api/patient/delete/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -216,6 +218,60 @@ app.delete('/api/patient/delete/:id', async (req, res) => {
     res.status(500).json({ error: 'Internal server error' });
   }
 });
+
+// Find Patient By ID
+app.get('/api/patient/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const patient = await Patient.findById(id);
+
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    const testData = patient.Tests;
+    const testDataPresent = testData && Object.values(testData).some(value => value !== '');
+
+    if (!testDataPresent) {
+      return res.status(200).json({ 
+        ...patient.toObject(), 
+        Tests: 'No Test Data Is Present, Please Add Test Data' 
+      });
+    }
+
+    res.status(200).json(patient);
+  } catch (error) {
+    console.error('Error fetching patient data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update Patient Data By ID
+app.put('/api/patient/update/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { Patient_Name, Patient_Age, Patient_Address, Patient_Gender, Patient_Phone_Number, Tests } = req.body;
+
+    const updatedPatient = await Patient.findByIdAndUpdate(id, {
+      Patient_Name,
+      Patient_Age,
+      Patient_Address,
+      Patient_Gender,
+      Patient_Phone_Number,
+      Tests
+    }, { new: true });
+
+    if (!updatedPatient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    res.status(200).json({ message: 'Patient data updated successfully', updatedPatient });
+  } catch (error) {
+    console.error('Error updating patient data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 
 app.listen(PORT, HOST, () => {
   console.log(`${SERVER_NAME} server running at http://${HOST}:${PORT}`);
