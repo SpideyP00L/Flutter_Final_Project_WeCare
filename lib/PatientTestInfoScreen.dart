@@ -46,6 +46,7 @@ class _PatientTestInfoScreenState extends State<PatientTestInfoScreen> {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else {
               final patientData = snapshot.data!;
+              final isSmallScreen = MediaQuery.of(context).size.width < 600; // Adjust this threshold as needed
               return Container(
                 padding: EdgeInsets.all(20),
                 child: Column(
@@ -66,64 +67,10 @@ class _PatientTestInfoScreenState extends State<PatientTestInfoScreen> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Padding(
-                        padding: const EdgeInsetsDirectional.only(start: 50, end: 50, top: 20, bottom: 20),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildInfoRow('Patient ID:', widget.patientId),
-                                  _buildInfoRow('Name:', patientData['Patient_Name']),
-                                  _buildInfoRow('Age:', '${patientData['Patient_Age']} years'),
-                                  _buildInfoRow('Address:', patientData['Patient_Address']),
-                                  _buildInfoRow('Gender:', patientData['Patient_Gender']),
-                                  _buildInfoRow('Phone Number:', patientData['Patient_Phone_Number']),
-                                ],
-                              ),
-                            ),
-                            VerticalDivider(),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Test Information',
-                                    style: TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.blueAccent,
-                                    ),
-                                  ),
-                                  SizedBox(height: 20),
-                                  if (patientData['Tests'] != null && (patientData['Tests'] as Map).isNotEmpty)
-                                    Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        _buildInfoRow('Blood Pressure:', patientData['Tests']['Blood_Pressure'] ?? 'N/A'),
-                                        _buildInfoRow('Heart Rate:', patientData['Tests']['Heart_Rate'] ?? 'N/A'),
-                                        _buildInfoRow('Respiratory Rate:', patientData['Tests']['Respiratory_Rate'] ?? 'N/A'),
-                                        _buildInfoRow('Oxygen Saturation:', patientData['Tests']['Oxygen_Saturation'] ?? 'N/A'),
-                                        _buildInfoRow('Body Temperature:', patientData['Tests']['Body_Temperature'] ?? 'N/A'),
-                                      ],
-                                    ),
-                                  if (patientData['Tests'] == null || (patientData['Tests'] as Map).isEmpty)
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 20),
-                                      child: Text(
-                                        'No Tests Have Been Taken, Please Add Tests Data',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.black87,
-                                        ),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
+                        padding: EdgeInsets.all(isSmallScreen ? 20 : 50), // Adjust padding based on screen size
+                        child: isSmallScreen
+                            ? _buildVerticalLayout(patientData)
+                            : _buildHorizontalLayout(patientData),
                       ),
                     ),
                   ],
@@ -133,6 +80,112 @@ class _PatientTestInfoScreenState extends State<PatientTestInfoScreen> {
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildVerticalLayout(Map<String, dynamic> patientData) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildInfoRow('Patient ID:', widget.patientId),
+        _buildInfoRow('Name:', patientData['Patient_Name']),
+        _buildInfoRow('Age:', '${patientData['Patient_Age']} years'),
+        _buildInfoRow('Address:', patientData['Patient_Address']),
+        _buildInfoRow('Gender:', patientData['Patient_Gender']),
+        _buildInfoRow('Phone Number:', patientData['Patient_Phone_Number']),
+        SizedBox(height: 20),
+        Text(
+          'Test Information',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.blueAccent,
+          ),
+        ),
+        SizedBox(height: 20),
+        if (patientData['Tests'] != null && (patientData['Tests'] as Map).isNotEmpty)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildInfoRow('Blood Pressure:', patientData['Tests']['Blood_Pressure'] ?? 'N/A'),
+              _buildInfoRow('Heart Rate:', patientData['Tests']['Heart_Rate'] ?? 'N/A'),
+              _buildInfoRow('Respiratory Rate:', patientData['Tests']['Respiratory_Rate'] ?? 'N/A'),
+              _buildInfoRow('Oxygen Saturation:', patientData['Tests']['Oxygen_Saturation'] ?? 'N/A'),
+              _buildInfoRow('Body Temperature:', patientData['Tests']['Body_Temperature'] ?? 'N/A'),
+            ],
+          ),
+        if (patientData['Tests'] == null || (patientData['Tests'] as Map).isEmpty)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Text(
+              'No Tests Have Been Taken, Please Add Tests Data',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black87,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildHorizontalLayout(Map<String, dynamic> patientData) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildInfoRow('Patient ID:', widget.patientId),
+              _buildInfoRow('Name:', patientData['Patient_Name']),
+              _buildInfoRow('Age:', '${patientData['Patient_Age']} years'),
+              _buildInfoRow('Address:', patientData['Patient_Address']),
+              _buildInfoRow('Gender:', patientData['Patient_Gender']),
+              _buildInfoRow('Phone Number:', patientData['Patient_Phone_Number']),
+            ],
+          ),
+        ),
+        VerticalDivider(),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Test Information',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blueAccent,
+                ),
+              ),
+              SizedBox(height: 20),
+              if (patientData['Tests'] != null && (patientData['Tests'] as Map).isNotEmpty)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildInfoRow('Blood Pressure:', patientData['Tests']['Blood_Pressure'] ?? 'N/A'),
+                    _buildInfoRow('Heart Rate:', patientData['Tests']['Heart_Rate'] ?? 'N/A'),
+                    _buildInfoRow('Respiratory Rate:', patientData['Tests']['Respiratory_Rate'] ?? 'N/A'),
+                    _buildInfoRow('Oxygen Saturation:', patientData['Tests']['Oxygen_Saturation'] ?? 'N/A'),
+                    _buildInfoRow('Body Temperature:', patientData['Tests']['Body_Temperature'] ?? 'N/A'),
+                  ],
+                ),
+              if (patientData['Tests'] == null || (patientData['Tests'] as Map).isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: Text(
+                    'No Tests Have Been Taken, Please Add Tests Data',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

@@ -69,6 +69,7 @@ app.post('/api/nurse/register', async (req, res) => {
   }
 });
 
+// Doctor registation Logic
 app.post('/api/doctor/register', async (req, res) => {
     try {
       console.log('Received data:', req.body);
@@ -87,6 +88,7 @@ app.post('/api/doctor/register', async (req, res) => {
     }
   });
 
+// Nurse login logic
 app.post('/api/nurse/login', async (req, res) => {
   try {
     const { Nurse_Email, Nurse_Password } = req.body;
@@ -108,6 +110,7 @@ app.post('/api/nurse/login', async (req, res) => {
   }
 });
 
+
 app.get('/api/nurse/name', async (req, res) => {
   try {
     const { email } = req.query;
@@ -124,6 +127,7 @@ app.get('/api/nurse/name', async (req, res) => {
   }
 });
 
+// Doctor Login Logic
 app.post('/api/doctor/login', async (req, res) => {
     try {
       const { Doctor_Email, Doctor_Password } = req.body;
@@ -145,7 +149,7 @@ app.post('/api/doctor/login', async (req, res) => {
     }
   });
 
-  // Save patient data
+// Save patient data
 app.post('/api/patient/save', async (req, res) => {
   try {
     console.log('Received patient data:', req.body);
@@ -268,6 +272,81 @@ app.put('/api/patient/update/:id', async (req, res) => {
     res.status(200).json({ message: 'Patient data updated successfully', updatedPatient });
   } catch (error) {
     console.error('Error updating patient data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Add tests to a patient by patient ID
+app.post('/api/patient/add-tests/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { tests } = req.body;
+
+    const patient = await Patient.findById(id);
+
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    // Merge existing tests with new tests
+    patient.Tests = { ...patient.Tests, ...tests };
+    await patient.save();
+
+    res.status(200).json({ message: 'Tests added successfully', updatedPatient: patient });
+  } catch (error) {
+    console.error('Error adding tests to patient:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Update tests for a patient by patient ID
+app.put('/api/patient/update-tests/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { tests } = req.body;
+
+    const patient = await Patient.findById(id);
+
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    // Update tests for the patient
+    patient.Tests = { ...patient.Tests, ...tests };
+    await patient.save();
+
+    res.status(200).json({ message: 'Tests updated successfully', updatedPatient: patient });
+  } catch (error) {
+    console.error('Error updating tests for patient:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Delete tests for a patient by patient ID
+app.delete('/api/patient/delete-tests/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the patient by ID
+    const patient = await Patient.findById(id);
+
+    if (!patient) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
+    // Update the patient document to indicate tests deleted
+    patient.Tests = {
+      Blood_Pressure: 'Test data deleted',
+      Heart_Rate: 'Test data deleted',
+      Respiratory_Rate: 'Test data deleted',
+      Oxygen_Saturation: 'Test data deleted',
+      Body_Temperature: 'Test data deleted'
+    };
+    await patient.save();
+
+    res.status(200).json({ message: 'Tests deleted successfully', updatedPatient: patient });
+  } catch (error) {
+    console.error('Error deleting tests for patient:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

@@ -27,62 +27,63 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
   }
 
   Widget _buildHomeWidget() {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.stretch,
-    children: [
-      ListTile(
-        leading: Icon(Icons.person, size: 48),
-        title: FutureBuilder<String>(
-          future: getNurseName(widget.email),
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else {
-              final nurseName = snapshot.data!;
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Welcome, $nurseName!',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    'Hope you are doing well today!',
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ],
-              );
-            }
-          },
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        ListTile(
+          leading: Icon(Icons.person, size: 48),
+          title: FutureBuilder<String>(
+            future: getNurseName(widget.email),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text('Error: ${snapshot.error}');
+              } else {
+                final nurseName = snapshot.data!;
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Welcome, $nurseName!',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Hope you are doing well today!',
+                      style: TextStyle(fontSize: 18),
+                    ),
+                  ],
+                );
+              }
+            },
+          ),
         ),
-      ),
-      Expanded(
-        child: _buildPatientList(),
-      ),
-      Padding(
-        padding: EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 10),
-        child: ElevatedButton(
-          onPressed: deleteAllPatients,
-          style: ElevatedButton.styleFrom(
-            primary: Colors.red, // Change the background color
-            onPrimary: Colors.white, // Change the text color
-            padding: EdgeInsets.symmetric(vertical: 16.0), // Adjust padding
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0), // Adjust the button's border radius
+        Expanded(
+          child: _buildPatientList(),
+        ),
+        Padding(
+          padding: EdgeInsets.only(left: 40, right: 40, top: 10, bottom: 10),
+          child: ElevatedButton(
+            onPressed: deleteAllPatients,
+            style: ElevatedButton.styleFrom(
+              primary: Colors.red,
+              onPrimary: Colors.white,
+              padding: EdgeInsets.symmetric(vertical: 16.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(
+                    8.0),
+              ),
+            ),
+            child: Text(
+              'Delete All Patients',
+              style: TextStyle(fontSize: 18.0),
             ),
           ),
-          child: Text(
-            'Delete All Patients',
-            style: TextStyle(fontSize: 18.0),
-          ),
         ),
-      ),
-    ],
-  );
-}
-
+      ],
+    );
+  }
 
   Widget _buildPatientList() {
     return Builder(
@@ -158,6 +159,9 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
                                                   patientId: patient['_id']),
                                         ),
                                       );
+                                      setState(() {
+                                        _homeWidget = _buildHomeWidget();
+                                      });
                                     },
                                   ),
                                   IconButton(
@@ -251,7 +255,8 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
     TextEditingController _patientAgeController = TextEditingController();
     TextEditingController _patientAddressController = TextEditingController();
     TextEditingController _patientGenderController = TextEditingController();
-    TextEditingController _patientPhoneNumberController = TextEditingController();
+    TextEditingController _patientPhoneNumberController =
+        TextEditingController();
 
     Future<void> savePatientData() async {
       if (_formKey.currentState!.validate()) {
