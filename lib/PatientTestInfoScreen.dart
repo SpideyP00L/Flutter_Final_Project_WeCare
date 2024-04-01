@@ -29,6 +29,49 @@ class _PatientTestInfoScreenState extends State<PatientTestInfoScreen> {
     }
   }
 
+  Widget _buildDeleteButton(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        _deleteTests(context);
+      },
+      child: Text('Delete Tests'),
+    );
+  }
+
+  Future<void> _deleteTests(BuildContext context) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('http://127.0.0.1:9002/api/patient/delete-tests/${widget.patientId}'),
+      );
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Tests deleted successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Refresh the patient data after deletion
+        setState(() {
+          _futurePatientData = fetchPatientData();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to delete tests'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $error'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,6 +116,8 @@ class _PatientTestInfoScreenState extends State<PatientTestInfoScreen> {
                             : _buildHorizontalLayout(patientData),
                       ),
                     ),
+                    SizedBox(height: 20),
+                    _buildDeleteButton(context), // Add the delete button here
                   ],
                 ),
               );
