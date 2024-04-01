@@ -36,11 +36,11 @@ const patientSchema = new mongoose.Schema({
   Patient_Gender: String,
   Patient_Phone_Number: String,
   Tests: {
-    Blood_Pressure: String,
-    Heart_Rate: String,
-    Respiratory_Rate: String,
-    Oxygen_Saturation: String,
-    Body_Temperature: String
+    Blood_Pressure: Number,
+    Heart_Rate: Number,
+    Respiratory_Rate: Number,
+    Oxygen_Saturation: Number,
+    Body_Temperature: Number
   }
 });
 
@@ -282,17 +282,32 @@ app.post('/api/patient/add-tests/:id', async (req, res) => {
     const { id } = req.params;
     const { tests } = req.body;
 
+    console.log(`Adding tests to patient with ID: ${id}`);
+    console.log('Tests to be added:', tests);
+    
+    if (!tests) {
+      console.log('Tests field is missing in request body');
+      return res.status(400).json({ error: 'Tests field is missing in request body' });
+    }
+    
     const patient = await Patient.findById(id);
 
     if (!patient) {
+      console.log(`Patient with ID ${id} not found`);
       return res.status(404).json({ error: 'Patient not found' });
     }
 
-    // Merge existing tests with new tests
-    patient.Tests = { ...patient.Tests, ...tests };
+    // Convert test values to numbers
+    Object.keys(tests).forEach(testKey => {
+      tests[testKey] = parseFloat(tests[testKey]);
+    });
+
+    // Replace existing tests with new tests
+    patient.Tests = tests;
     await patient.save();
 
-    res.status(200).json({ message: 'Tests added successfully', updatedPatient: patient });
+    console.log(`Tests added successfully for patient with ID: ${patient._id}`);
+    res.status(201).json({ message: 'Tests added successfully', updatedPatientId: patient._id });
   } catch (error) {
     console.error('Error adding tests to patient:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -305,17 +320,27 @@ app.put('/api/patient/update-tests/:id', async (req, res) => {
     const { id } = req.params;
     const { tests } = req.body;
 
+    console.log(`Updating tests for patient with ID: ${id}`);
+    console.log('Updated tests:', tests);
+    
     const patient = await Patient.findById(id);
 
     if (!patient) {
+      console.log(`Patient with ID ${id} not found`);
       return res.status(404).json({ error: 'Patient not found' });
     }
 
-    // Update tests for the patient
-    patient.Tests = { ...patient.Tests, ...tests };
+    // Convert test values to numbers
+    Object.keys(tests).forEach(testKey => {
+      tests[testKey] = parseFloat(tests[testKey]);
+    });
+
+    // Replace existing tests with new tests
+    patient.Tests = tests;
     await patient.save();
 
-    res.status(200).json({ message: 'Tests updated successfully', updatedPatient: patient });
+    console.log(`Tests updated successfully for patient with ID: ${patient._id}`);
+    res.status(200).json({ message: 'Tests updated successfully', updatedPatientId: patient._id });
   } catch (error) {
     console.error('Error updating tests for patient:', error);
     res.status(500).json({ error: 'Internal server error' });
@@ -327,30 +352,28 @@ app.delete('/api/patient/delete-tests/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Find the patient by ID
+    console.log(`Deleting tests for patient with ID: ${id}`);
+    
     const patient = await Patient.findById(id);
 
     if (!patient) {
+      console.log(`Patient with ID ${id} not found`);
       return res.status(404).json({ error: 'Patient not found' });
     }
 
-    // Update the patient document to indicate tests deleted
-    patient.Tests = {
-      Blood_Pressure: 'Test data deleted',
-      Heart_Rate: 'Test data deleted',
-      Respiratory_Rate: 'Test data deleted',
-      Oxygen_Saturation: 'Test data deleted',
-      Body_Temperature: 'Test data deleted'
-    };
+    console.log('Tests to be deleted:', patient.Tests);
+    
+    // Remove tests object from patient document
+    patient.Tests = undefined;
     await patient.save();
 
-    res.status(200).json({ message: 'Tests deleted successfully', updatedPatient: patient });
+    console.log(`Tests deleted successfully for patient with ID: ${patient._id}`);
+    res.status(200).json({ message: 'Tests deleted successfully', updatedPatientId: patient._id });
   } catch (error) {
     console.error('Error deleting tests for patient:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
-
 
 app.listen(PORT, HOST, () => {
   console.log(`${SERVER_NAME} server running at http://${HOST}:${PORT}`);
