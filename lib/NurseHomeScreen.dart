@@ -83,6 +83,7 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
       ],
     );
   }
+  
 
   Widget _buildPatientList() {
     return Builder(
