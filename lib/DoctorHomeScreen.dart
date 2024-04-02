@@ -89,7 +89,7 @@ class _DoctorHomeScreenState extends State<DoctorHomeScreen> {
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),
-                                      ],
+                                      ], 
                                     ),
                                   ),
                                   Expanded(
