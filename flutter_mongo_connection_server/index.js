@@ -375,6 +375,51 @@ app.delete('/api/patient/delete-tests/:id', async (req, res) => {
   }
 });
 
+// Retrieve Test Data Analysis for All Patients
+app.get('/api/patients/analysis', async (req, res) => {
+  try {
+    const patients = await Patient.find();
+
+    if (!patients || patients.length === 0) {
+      return res.status(404).json({ error: 'No patients found' });
+    }
+
+    // Define normal, low, and high ranges for each test parameter
+    const ranges = {
+      Blood_Pressure: { low: 90, high: 140 },
+      Heart_Rate: { low: 60, high: 100 },
+      Respiratory_Rate: { low: 12, high: 20 },
+      Oxygen_Saturation: { low: 90, high: Infinity },
+      Body_Temperature: { low: 36, high: 37.5 }
+    };
+
+    const patientsAnalysis = patients.map(patient => {
+      const testData = patient.Tests;
+      const analysis = {};
+
+      for (const [test, value] of Object.entries(testData)) {
+        const range = ranges[test];
+        if (range) {
+          if (value < range.low) {
+            analysis[test] = 'Low';
+          } else if (value > range.high) {
+            analysis[test] = 'High';
+          } else {
+            analysis[test] = 'Normal';
+          }
+        }
+      }
+
+      return { patient, analysis };
+    });
+
+    res.status(200).json(patientsAnalysis);
+  } catch (error) {
+    console.error('Error fetching patients data:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 app.listen(PORT, HOST, () => {
   console.log(`${SERVER_NAME} server running at http://${HOST}:${PORT}`);
 });

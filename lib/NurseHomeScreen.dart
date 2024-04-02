@@ -71,8 +71,7 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
               onPrimary: Colors.white,
               padding: EdgeInsets.symmetric(vertical: 16.0),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(
-                    8.0),
+                borderRadius: BorderRadius.circular(8.0),
               ),
             ),
             child: Text(
@@ -143,6 +142,71 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
                                   SizedBox(height: 4),
                                   Text(
                                       'Phone Number: ${patient['Patient_Phone_Number']}'),
+                                  SizedBox(height: 20),
+                                  if (patient['Tests'] != null &&
+                                      (patient['Tests'] as Map).isNotEmpty)
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        _buildInfoRow(
+                                            'Blood Pressure:',
+                                            patient['Tests']
+                                                        ['Blood_Pressure'] !=
+                                                    null
+                                                ? patient['Tests']
+                                                        ['Blood_Pressure']
+                                                    .toString()
+                                                : 'N/A'),
+                                        _buildInfoRow(
+                                            'Heart Rate:',
+                                            patient['Tests']['Heart_Rate'] !=
+                                                    null
+                                                ? patient['Tests']['Heart_Rate']
+                                                    .toString()
+                                                : 'N/A'),
+                                        _buildInfoRow(
+                                            'Respiratory Rate:',
+                                            patient['Tests']
+                                                        ['Respiratory_Rate'] !=
+                                                    null
+                                                ? patient['Tests']
+                                                        ['Respiratory_Rate']
+                                                    .toString()
+                                                : 'N/A'),
+                                        _buildInfoRow(
+                                            'Oxygen Saturation:',
+                                            patient['Tests']
+                                                        ['Oxygen_Saturation'] !=
+                                                    null
+                                                ? patient['Tests']
+                                                        ['Oxygen_Saturation']
+                                                    .toString()
+                                                : 'N/A'),
+                                        _buildInfoRow(
+                                            'Body Temperature:',
+                                            patient['Tests']
+                                                        ['Body_Temperature'] !=
+                                                    null
+                                                ? patient['Tests']
+                                                        ['Body_Temperature']
+                                                    .toString()
+                                                : 'N/A'),
+                                      ],
+                                    ),
+                                  if (patient['Tests'] == null ||
+                                      (patient['Tests'] as Map).isEmpty)
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 20),
+                                      child: Text(
+                                        'No Tests Have Been Taken, Please Add Tests Data',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                    ),
                                 ],
                               ),
                               trailing: Row(
@@ -193,6 +257,21 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildInfoRow(String label, String value) {
+    return Row(
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        SizedBox(width: 4),
+        Text(value),
+      ],
     );
   }
 
