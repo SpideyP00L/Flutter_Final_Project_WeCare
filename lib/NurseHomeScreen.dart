@@ -67,8 +67,8 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
           child: ElevatedButton(
             onPressed: deleteAllPatients,
             style: ElevatedButton.styleFrom(
-              primary: Colors.red,
-              onPrimary: Colors.white,
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
               padding: EdgeInsets.symmetric(vertical: 16.0),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
@@ -515,7 +515,7 @@ class _NurseHomeScreenState extends State<NurseHomeScreen> {
                 child: ElevatedButton(
                   onPressed: savePatientData,
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.transparent,
+                    backgroundColor: Colors.transparent,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(50),
                     ),

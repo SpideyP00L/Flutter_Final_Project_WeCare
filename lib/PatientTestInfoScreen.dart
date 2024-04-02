@@ -39,8 +39,8 @@ class _PatientTestInfoScreenState extends State<PatientTestInfoScreen> {
         _deleteTests(context);
       },
       style: ElevatedButton.styleFrom(
-        primary: Colors.red,
-        onPrimary: Colors.white,
+        backgroundColor: Colors.red,
+        foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
@@ -69,8 +69,8 @@ class _PatientTestInfoScreenState extends State<PatientTestInfoScreen> {
         );
       },
       style: ElevatedButton.styleFrom(
-        primary: Colors.green,
-        onPrimary: Colors.white,
+        backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
@@ -99,8 +99,8 @@ class _PatientTestInfoScreenState extends State<PatientTestInfoScreen> {
         );
       },
       style: ElevatedButton.styleFrom(
-        primary: Colors.blue,
-        onPrimary: Colors.white,
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),

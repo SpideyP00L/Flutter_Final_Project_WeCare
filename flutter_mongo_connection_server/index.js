@@ -10,7 +10,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-const uristring = 'mongodb+srv://admin:admin@flutter-final-project-c.dvwkiwm.mongodb.net/';
+const uristring = 'mongodb+srv://admin:admin@cluster0.zxf4zp4.mongodb.net/';
 
 const nurseSchema = new mongoose.Schema({
   Nurse_Full_Name: String,

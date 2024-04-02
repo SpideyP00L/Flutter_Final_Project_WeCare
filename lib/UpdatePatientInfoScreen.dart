@@ -337,7 +337,7 @@ class _UpdatePatientInfoScreenState extends State<UpdatePatientInfoScreen> {
                   child: ElevatedButton(
                     onPressed: updatePatientData,
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.transparent,
+                      backgroundColor: Colors.transparent,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(50),
                       ),

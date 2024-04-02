@@ -215,7 +215,7 @@ class _DoctorNewLoginScreenState extends State<DoctorNewLoginScreen> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.transparent,
+                          backgroundColor: Colors.transparent,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50),
                           ),
